@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./style.css">
+    <title>Weather Search</title>
+</head>
+<body>
+    <header><h1>Weather Dashboard</h1></header>
+
+    <main class="container">
+        <div class="layoutLeft">
+            <section class="search">
+                    <form class="search__form">
+                        <input type="text" value="" placeholder="Search for a City">
+                        <button class="searchBtn">search</button>
+                    </form>
+                    <ul class="search__list">
+                        <li class="search__item">test</li>
+                        <li class="search__item">test2</li>  
+                    </ul>
+            </section>
+        </div>
+
+        <div class="layoutRight">
+            <section class="currentCity">
+                <h2 class="heading">
+                    <p class="currentCity__stat">Riverside
+                        <span class="currentCity__stat--date">8/15/2019</span>
+                    </p>
+                </h2>
+                <p class="currentCity__stat">Temperature:
+                    <span class="currentCity__stat--temp">90</span>&#8457;
+                </p>
+                <p class="currentCity__stat">Humidity:
+                    <span class="currentCity__stat--hum">41</span>&#37;
+                </p>
+                <p class="currentCity__stat">Wind Speed:
+                    <span class="currentCity__stat--wind">1.5</span> MPH
+                </p>
+                <p class="currentCity__stat">UV Index:
+                    <span class="currentCity__stat--uv"></span>
+                </p>
+            </section>
+        
+            <section class="fiveDays">
+                <h3>5-Day Forecast:</h3>
+                <div class="card">
+                    <h4 class="fiveDays__date">8/16/2019</h3>
+                    <div class="fiveDays__icon">icon</div>
+                    <p class="fiveDays__stat">Temp: 
+                        <span class="fiveDays__stat--temp">86</span>&#8457;
+                    </p>
+                    <p class="fiveDays__stat">Humidity: 
+                        <span class="fiveDays__stat--hum">44</span>&#37;
+                    </p>
+                </div>
+            </section>
+        </div>
+        
+    </main>
+
+    <script src="./script.js"></script>
+</body>
+</html>
