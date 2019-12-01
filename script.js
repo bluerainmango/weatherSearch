@@ -31,13 +31,8 @@ var state = {
         renderIcon(state.currentWeather.weather[0].icon, '#currentCity__stat--icon');
         render5days(state.forecast5days);
 
-        // add city to searchedCities
-        
-        
-
         // LocalStorage
-        saveToLocal(input);
-        console.log(state.searchedCities);
+        saveToLocal(state.currentWeather.name);
         renderList();
     }
 
@@ -165,7 +160,7 @@ var state = {
     }
     function renderSearchLists(){
 
-        var l = state.searchedCities.length;
+        var l = state.searchedCities.length-1;
 
         for( var i=l ; i >= 0 ; i-- ){
             renderList(i);
@@ -173,9 +168,13 @@ var state = {
     }
     function renderList( i=0 ){
 
-        var li = $('<li>').append(state.searchedCities[i]).addClass('search__item');
+        var city = state.searchedCities[i];
+        var duplicated = $(`[data-date="${city}"]`);
+        console.log(duplicated)
+        duplicated.remove();
+        var li = $('<li>').append(city).addClass('search__item').attr('data-date',city);
         $('#search__list').prepend(li);
-        
+
     }
     function saveToLocal(str){
 
@@ -189,17 +188,18 @@ var state = {
         localStorage.setItem('searchedCities', JSON.stringify(set));
 
     }
+    function getFromLocal(){
 
+        var localData = JSON.parse(localStorage.getItem('searchedCities'));
+        if(localData){ state.searchedCities = localData };
+
+    }
 // Event
     $('#searchBtn').click(searchBtnHandler);
 
     function init(){
+        getFromLocal();
 
-        // Get data from localstorage
-        var localData = JSON.parse(localStorage.getItem('searchedCities'));
-        
-        if(localData){ state.searchedCities = localData };
-        
         renderSearchLists();
         // get lastest city index = state[5days].length-1
         // getCurrentWeather(state[5days][index])
