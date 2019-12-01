@@ -14,26 +14,18 @@ var state = {
 
     // Event Handler
     async function searchBtnHandler(e){
+        
         e.preventDefault();
-        var input = $('#searchInput').val().trim();
-        console.log(input);
 
-        // Get data from server
-        await getCurrentWeather(input); console.log(state.currentWeather);
-        await getUV(); console.log(state.currentUV);
-        await get5days(state.currentWeather.id); console.log(state.forecast5days)
+        var city = $('#searchInput').val().trim(); console.log(city);
 
+        // Get server data and render to DOM
+        await getDataAndRender(city);
 
-        // Render
-        renderCurrentWeather(state.currentWeather);
-        renderUV(state.currentUV.value);
-        renderDate(state.currentUV.date_iso, '#currentCity__stat--date');
-        renderIcon(state.currentWeather.weather[0].icon, '#currentCity__stat--icon');
-        render5days(state.forecast5days);
-
-        // LocalStorage
+        // Save searches to LocalStorage
         saveToLocal(state.currentWeather.name);
         renderList();
+        
     }
 
     // Getting Data
@@ -97,6 +89,21 @@ var state = {
     }
 
     // Functions
+    async function getDataAndRender(city){
+
+        // Get data from server
+        await getCurrentWeather(city); console.log(state.currentWeather);
+        await getUV(); console.log(state.currentUV);
+        await get5days(state.currentWeather.id); console.log(state.forecast5days)
+
+        // Render it to DOM
+        renderCurrentWeather(state.currentWeather);
+        renderUV(state.currentUV.value);
+        renderDate(state.currentUV.date_iso, '#currentCity__stat--date');
+        renderIcon(state.currentWeather.weather[0].icon, '#currentCity__stat--icon');
+        render5days(state.forecast5days);
+
+    }
     function renderCurrentWeather(data){
 
         // var tempF = convertToFahrenheit(data.main.temp);
@@ -169,10 +176,13 @@ var state = {
     function renderList( i=0 ){
 
         var city = state.searchedCities[i];
-        var duplicated = $(`[data-date="${city}"]`);
-        console.log(duplicated)
-        duplicated.remove();
-        var li = $('<li>').append(city).addClass('search__item').attr('data-date',city);
+
+        // Delete duplicated search if applicable
+        var duplicated = $(`[data-city="${city}"]`);
+        if(duplicated){ duplicated.remove() }
+        
+        // Create list and render to DOM(always the latest search is on the top of the list)
+        var li = $('<li>').append(city).addClass('search__item').attr('data-city',city);
         $('#search__list').prepend(li);
 
     }
@@ -194,17 +204,27 @@ var state = {
         if(localData){ state.searchedCities = localData };
 
     }
+
+
 // Event
     $('#searchBtn').click(searchBtnHandler);
 
     function init(){
-        getFromLocal();
 
+        getFromLocal();
         renderSearchLists();
+
         // get lastest city index = state[5days].length-1
         // getCurrentWeather(state[5days][index])
         // renderCurrentWeather(state[5days][index])
     }
+    $('#search__list').click(function(e){
+        console.log($(e.target).closest('li'))
+        var city = $(e.target).closest('li').attr('data-city');
+        getDataAndRender(city);
+    })
+
+
     init();
     
 
