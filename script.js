@@ -1,7 +1,3 @@
-// 97d190fa05736dbbbe2bbec8cbd5573c
-// http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=
-//api.openweathermap.org/data/2.5/weather?q=seoul&APPID=97d190fa05736dbbbe2bbec8cbd5573c
-
 var state = {
                 apiKey:'97d190fa05736dbbbe2bbec8cbd5573c',
                 searchedCities: [],
@@ -26,6 +22,12 @@ var state = {
         saveToLocal(state.currentWeather.name);
         renderList();
         
+    }
+    function cityClickHandler(e){
+
+        var city = $(e.target).closest('li').attr('data-city');
+        getDataAndRender(city);
+    
     }
 
     // Getting Data
@@ -111,15 +113,19 @@ var state = {
         $('#currentCity__stat--temp').text(data.main.temp);
         $('#currentCity__stat--hum').text(data.main.humidity);
         $('#currentCity__stat--wind').text(data.wind.speed);
-        
+
     }
     function renderUV(uv){
+
         $('#currentCity__stat--uv').text(uv);
+
     }
     function renderDate(date, addTo){
+
         var date = new Date();
         var today = `${date.getMonth()+1} / ${date.getDate()} / ${date.getFullYear()}`
         $(addTo).text(today);
+
     }
     function renderIcon(iconCode, addTo, i=0){
         
@@ -204,34 +210,26 @@ var state = {
         if(localData){ state.searchedCities = localData };
 
     }
-
-
-// Event
-    $('#searchBtn').click(searchBtnHandler);
-
     function init(){
 
+        // Get data from localStorage
         getFromLocal();
+        
+        // Render searched cities list
         renderSearchLists();
 
-        // get lastest city index = state[5days].length-1
-        // getCurrentWeather(state[5days][index])
-        // renderCurrentWeather(state[5days][index])
-    }
-    $('#search__list').click(function(e){
-        console.log($(e.target).closest('li'))
-        var city = $(e.target).closest('li').attr('data-city');
-        getDataAndRender(city);
-    })
+        // Render last searched city's weather & 5days forecast
+        getDataAndRender(state.searchedCities[0]);
 
+    }
+
+// Search button event
+    $('#searchBtn').click(searchBtnHandler);
+
+// Searched cities click event
+    $('#search__list').click(cityClickHandler)
 
     init();
-    
-
-
-
-
-
-
+  
 })
 
