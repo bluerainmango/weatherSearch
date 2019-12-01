@@ -23,6 +23,7 @@ var state = {
         await getUV(); console.log(state.currentUV);
         await get5days(state.currentWeather.id); console.log(state.forecast5days)
 
+
         // Render
         renderCurrentWeather(state.currentWeather);
         renderUV(state.currentUV.value);
@@ -31,11 +32,13 @@ var state = {
         render5days(state.forecast5days);
 
         // add city to searchedCities
-        state.searchedCities.pop(input);
-
-        // LocalStorage
+        
         
 
+        // LocalStorage
+        saveToLocal(input);
+        console.log(state.searchedCities);
+        renderList();
     }
 
     // Getting Data
@@ -102,6 +105,7 @@ var state = {
     function renderCurrentWeather(data){
 
         // var tempF = convertToFahrenheit(data.main.temp);
+        $('#currentCity__stat--city').text(data.name);
         $('#currentCity__stat--temp').text(data.main.temp);
         $('#currentCity__stat--hum').text(data.main.humidity);
         $('#currentCity__stat--wind').text(data.wind.speed);
@@ -118,9 +122,8 @@ var state = {
     function renderIcon(iconCode, addTo, i=0){
         
         var imgSrc = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
-        var imgTag = $($(addTo)[i]).append('<img>').children()[0];
-        
-        $(imgTag).attr('src',imgSrc);
+        var imgTag = $($(addTo)[i]).append('<img>').children().eq(0);
+            imgTag.attr('src',imgSrc);
         
     }
     function formatDate(date){
@@ -129,7 +132,11 @@ var state = {
     }
     function render5days(data){
         
-        for( var i = 0 ; i < data.length ; i++ ){
+        $('#5days').empty();
+
+        var l = data.length;
+
+        for( var i = 0 ; i < l ; i++ ){
             
             var date = data[i].dt_txt.split(' ')[0]; // ie: 2019-12-01
                 date = formatDate(date);
@@ -156,16 +163,55 @@ var state = {
         }
         
     }
+    function renderSearchLists(){
 
-    
+        var l = state.searchedCities.length;
+
+        for( var i=l ; i >= 0 ; i-- ){
+            renderList(i);
+        }
+    }
+    function renderList( i=0 ){
+
+        var li = $('<li>').append(state.searchedCities[i]).addClass('search__item');
+        $('#search__list').prepend(li);
+        
+    }
+    function saveToLocal(str){
+
+        state.searchedCities.unshift(str);
+
+        // Delete the duplicated city names 
+        var set = Array.from( new Set(state.searchedCities) );
+        // Save to state
+        state.searchedCities = set;
+        // Save to localStorage
+        localStorage.setItem('searchedCities', JSON.stringify(set));
+
+    }
+
 // Event
-    $('#searchBtn').click(searchBtnHandler)
+    $('#searchBtn').click(searchBtnHandler);
+
+    function init(){
+
+        // Get data from localstorage
+        var localData = JSON.parse(localStorage.getItem('searchedCities'));
+        
+        if(localData){ state.searchedCities = localData };
+        
+        renderSearchLists();
+        // get lastest city index = state[5days].length-1
+        // getCurrentWeather(state[5days][index])
+        // renderCurrentWeather(state[5days][index])
+    }
+    init();
+    
+
+
+
+
+
 
 })
 
-function init(){
-    // localstorage
-    // get lastest city index = state[5days].length-1
-    // getCurrentWeather(state[5days][index])
-    // renderCurrentWeather(state[5days][index])
-}

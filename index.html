@@ -17,18 +17,17 @@
                         <input id="searchInput" type="text" placeholder="Search for a City">
                         <button id="searchBtn">search</button>
                     </form>
-                    <ul class="search__list">
-                        <li class="search__item">test</li>
-                        <li class="search__item">test2</li>  
+                    <ul id="search__list">
                     </ul>
             </section>
         </div>
 
         <div class="layoutRight">
             <section class="currentCity">
-                <h2 class="heading">
-                    <p id="currentCity__stat">Riverside
-                        <span id="currentCity__stat--date">8/15/2019</span>
+                <h2>
+                    <p id="currentCity__stat--heading">
+                        <span id="currentCity__stat--city"></span>
+                        <span id="currentCity__stat--date"></span>
                         <span id="currentCity__stat--icon"></span>
                     </p>
                 </h2>
@@ -45,20 +44,12 @@
                     <span id="currentCity__stat--uv"></span>
                 </p>
             </section>
-        
-            <section id="5days">
+            <section class="forcast">
                 <h3>5-Day Forecast:</h3>
-                <div class="card">
-                    <!-- <h4 id="5days__date">8/16/2019</h3>
-                    <div id="5days__icon">icon</div>
-                    <p class="5days__stat">Temp: 
-                        <span id="5days__stat--temp">86</span>&#8457;
-                    </p>
-                    <p class="5days__stat">Humidity: 
-                        <span id="5days__stat--hum">44</span>&#37;
-                    </p> -->
+                <div id="5days">
                 </div>
             </section>
+            
         </div>
         
     </main>
