@@ -15,11 +15,8 @@ var state = {
     // Event Handler
     async function searchBtnHandler(e){
         e.preventDefault();
-        var input = $('#searchInput').val();
+        var input = $('#searchInput').val().trim();
         console.log(input);
-
-        // add city to searchedCities
-        state.searchedCities.pop(input);
 
         // Get data from server
         await getCurrentWeather(input); console.log(state.currentWeather);
@@ -32,15 +29,31 @@ var state = {
         renderDate(state.currentUV.date_iso, '#currentCity__stat--date');
         renderIcon(state.currentWeather.weather[0].icon, '#currentCity__stat--icon');
         render5days(state.forecast5days);
+
+        // add city to searchedCities
+        state.searchedCities.pop(input);
+
+        // LocalStorage
+        
+
     }
 
     // Getting Data
     async function getCurrentWeather(city){
         
-        await $.ajax({
-                        url: `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&APPID=${state.apiKey}`,
-                        method: 'GET'
+        try{
+
+            await $.ajax({
+                url: `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&APPID=${state.apiKey}`,
+                method: 'GET'
             }).then(function(response){ state.currentWeather = response });
+
+        } catch(err){
+            
+            alert("The city cannot be found. Please enter a valid city name.");
+            throw new Error("Wrong city name. Failed to get data from the server. Stop the app.");
+
+        }
 
     }
     async function getUV(){
@@ -48,26 +61,40 @@ var state = {
         var lat = state.currentWeather.coord.lat;
         var lon = state.currentWeather.coord.lon;
 
-        await $.ajax({
-                        url: `http://api.openweathermap.org/data/2.5/uvi?appid=${state.apiKey}&lat=${lat}&lon=${lon}`,
-                        method: 'GET'
-                }).then(function(response){ state.currentUV = response });
+        try{
+            
+            await $.ajax({
+                url: `http://api.openweathermap.org/data/2.5/uvi?appid=${state.apiKey}&lat=${lat}&lon=${lon}`,
+                method: 'GET'
+            }).then(function(response){ state.currentUV = response });
+
+        } catch(err){
+            throw new Error("Unkown server err during getting UV data. Stop the app.");
+        }
+        
     }
     async function get5days(cityID){
 
-        await $.ajax({
-            url: `http://api.openweathermap.org/data/2.5/forecast?id=${cityID}&units=imperial&appid=${state.apiKey}`,
-            method: 'GET'
-        }).then(function(response){
-         
-            // list up only one listing of each day by time(12 noon) out of 40 listings(3 hourly lists)
-            var list5days = response.list.filter(function(val){
-                                var date = val.dt_txt.split(' '); // dt_txt: "2019-12-02 12:00:00"
-                                return date[1].startsWith('12');
-                            })
+        try {
 
-            state.forecast5days = list5days;
-        })
+            await $.ajax({
+                url: `http://api.openweathermap.org/data/2.5/forecast?id=${cityID}&units=imperial&appid=${state.apiKey}`,
+                method: 'GET'
+            }).then(function(response){
+             
+                // list up only one listing of each day by time(12 noon) out of 40 listings(3 hourly lists)
+                var list5days = response.list.filter(function(val){
+                                    var date = val.dt_txt.split(' '); // dt_txt: "2019-12-02 12:00:00"
+                                    return date[1].startsWith('12');
+                                })
+    
+                state.forecast5days = list5days;
+            });
+
+        } catch(err){
+            throw new Error("Unkown server err during getting 5days data. Stop the app.");
+        }
+        
 
     }
 
