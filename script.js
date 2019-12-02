@@ -1,36 +1,61 @@
-var state = {
-                apiKey:'97d190fa05736dbbbe2bbec8cbd5573c',
-                searchedCities: [],
-                currentWeather: null,
-                currentUV: null,
-                forecast5days: null
-            }
+$('document').ready(function(){
 
-    $('document').ready(function(){
+    var state = {
+        apiKey:'97d190fa05736dbbbe2bbec8cbd5573c',
+        searchedCities: [],
+        currentWeather: null,
+        currentUV: {},
+        forecast5days: null
+    }
 
-    // Event Handler
+/****************************/
+/*     EVENT HANDLERS       */
+/****************************/
+
+    // 1. Search button event
     async function searchBtnHandler(e){
         
         e.preventDefault();
 
-        var city = $('#searchInput').val().trim(); console.log(city);
+        // Show clear search history button
+        $('#clear').removeClass('hide');
+
+        var city = $('#searchInput').val().trim();
+        
+        // Clear input field
+        $('#searchInput').val("");
 
         // Get server data and render to DOM
         await getDataAndRender(city);
 
-        // Save searches to LocalStorage
+        // Save searched city to LocalStorage
         saveToLocal(state.currentWeather.name);
+        
+        // Render searched cities list
         renderList();
         
     }
+    // 2. Searched cities click event 
     function cityClickHandler(e){
 
         var city = $(e.target).closest('li').attr('data-city');
         if(city){ getDataAndRender(city) }
     
     }
+    // 3. Clear button click event
+    function clearSearch(){
 
-    // Getting Data
+        state.searchedCities=[];
+        localStorage.removeItem('searchedCities');
+        $('#search__list').empty();
+        $(this).addClass('hide');
+
+    }
+
+/****************************/
+/* GETTING DATA FROM SERVER */
+/****************************/
+
     async function getCurrentWeather(city){
         
         try{
@@ -43,7 +68,7 @@ var state = {
         } catch(err){
             
             alert("The city cannot be found. Please enter a valid city name.");
-            throw new Error("Wrong city name. Failed to get data from the server. Stop the app.");
+            throw new Error("Wrong city name. Failed to get data from the server. The app is stopped.");
 
         }
 
@@ -61,7 +86,9 @@ var state = {
             }).then(function(response){ state.currentUV = response });
 
         } catch(err){
-            throw new Error("Unkown server err during getting UV data. Stop the app.");
+            // ie: london
+            console.log( new Error("Unkown server err during getting UV data. No data exists for this city or we cannot retrieve the data at this moment." ));
+            state.currentUV.value = "No data"
         }
         
     }
@@ -90,13 +117,16 @@ var state = {
 
     }
 
-    // Functions
+/****************************/
+/*          FUNCTION        */
+/****************************/
+
     async function getDataAndRender(city){
 
         // Get data from server
-        await getCurrentWeather(city); console.log(state.currentWeather);
-        await getUV(); console.log(state.currentUV);
-        await get5days(state.currentWeather.id); console.log(state.forecast5days)
+        await getCurrentWeather(city);
+        await getUV();
+        await get5days(state.currentWeather.id);
 
         // Render it to DOM
         renderCurrentWeather(state.currentWeather);
@@ -108,7 +138,6 @@ var state = {
     }
     function renderCurrentWeather(data){
 
-        // var tempF = convertToFahrenheit(data.main.temp);
         $('#currentCity__stat--city').text(data.name);
         $('#currentCity__stat--temp').text(data.main.temp);
         $('#currentCity__stat--hum').text(data.main.humidity);
@@ -123,13 +152,13 @@ var state = {
     function renderDate(date, addTo){
 
         var date = new Date();
-        var today = `${date.getMonth()+1} / ${date.getDate()} / ${date.getFullYear()}`
+        var today = `(${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()})`
         $(addTo).text(today);
 
     }
     function renderIcon(iconCode, addTo, i=0){
 
-        // if there is already a img, delete it
+        // If there is an existing icon image, delete it
         if( $($(addTo)[i]).children().length > 0 ){
             $(addTo).empty();
         }
@@ -140,15 +169,19 @@ var state = {
         
     }
     function formatDate(date){
+
         var dateArr = date.split('-');
         return `${dateArr[1]} / ${dateArr[2]} / ${dateArr[0]}`;
+
     }
     function render5days(data){
         
+        // Delete existing DOM
         $('#fiveDays').empty();
 
         var l = data.length;
 
+        // Render 5 day forcast
         for( var i = 0 ; i < l ; i++ ){
             
             var date = data[i].dt_txt.split(' ')[0]; // ie: 2019-12-01
@@ -203,8 +236,10 @@ var state = {
 
         // Delete the duplicated city names 
         var set = Array.from( new Set(state.searchedCities) );
-        // Save to state
+        
+        // Save to state obj
         state.searchedCities = set;
+        
         // Save to localStorage
         localStorage.setItem('searchedCities', JSON.stringify(set));
 
@@ -215,24 +250,42 @@ var state = {
         if(localData){ state.searchedCities = localData };
 
     }
-    function init(){
+    async function init(){
 
         // Get data from localStorage
         getFromLocal();
-        
-        // Render searched cities list
-        renderSearchLists();
 
-        // Render last searched city's weather & 5days forecast
-        getDataAndRender(state.searchedCities[0]);
+        // If there is no searched city saved, start with 'Riverside' weather
+        if(state.searchedCities.length === 0){
+            
+            getDataAndRender('riverside');
 
+        }
+        else{
+            $('#clear').removeClass('hide');
+
+            // Render searched cities list
+            renderSearchLists();
+
+            // Get data and render to DOM
+            getDataAndRender(state.searchedCities[0]);
+
+        }
     }
+
+/****************************/
+/*          EVENT           */
+/****************************/
 
 // Search button event
     $('#searchBtn').click(searchBtnHandler);
 
 // Searched cities click event
-    $('#search__list').click(cityClickHandler)
+    $('#search__list').click(cityClickHandler);
+
+// Clear searched cities click event
+    $('#clear').click(clearSearch);
+
 
     init();
   
