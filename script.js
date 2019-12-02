@@ -26,7 +26,7 @@ var state = {
     function cityClickHandler(e){
 
         var city = $(e.target).closest('li').attr('data-city');
-        getDataAndRender(city);
+        if(city){ getDataAndRender(city) }
     
     }
 
@@ -128,7 +128,12 @@ var state = {
 
     }
     function renderIcon(iconCode, addTo, i=0){
-        
+
+        // if there is already a img, delete it
+        if( $($(addTo)[i]).children().length > 0 ){
+            $(addTo).empty();
+        }
+
         var imgSrc = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
         var imgTag = $($(addTo)[i]).append('<img>').children().eq(0);
             imgTag.attr('src',imgSrc);
@@ -140,7 +145,7 @@ var state = {
     }
     function render5days(data){
         
-        $('#5days').empty();
+        $('#fiveDays').empty();
 
         var l = data.length;
 
@@ -152,21 +157,21 @@ var state = {
             var hum = data[i].main.humidity;
 
             var html = `<div class="card">
-                            <h4 class="5days__date">${date}</h3>
-                            <div class="5days__icon"></div>
-                            <p class="5days__stat">Temp: 
-                                <span class="5days__stat--temp">${temp}</span>&#8457;
+                            <h4 class="fiveDays__date">${date}</h3>
+                            <div class="fiveDays__icon"></div>
+                            <p class="fiveDays__stat">Temp: 
+                                <span class="fiveDays__stat--temp">${temp}</span>&#8457;
                             </p>
-                            <p class="5days__stat">Humidity: 
-                                <span class="5days__stat--hum">${hum}</span>&#37;
+                            <p class="fiveDays__stat">Humidity: 
+                                <span class="fiveDays__stat--hum">${hum}</span>&#37;
                             </p>
                         </div>`
 
-            $('#5days').append(html);
+            $('#fiveDays').append(html);
 
             // Render icon
             var icon = data[i].weather[0].icon;
-            renderIcon(icon, '.5days__icon', i);
+            renderIcon(icon, '.fiveDays__icon', i);
            
         }
         
