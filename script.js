@@ -61,7 +61,7 @@ $('document').ready(function(){
         try{
 
             await $.ajax({
-                url: `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&APPID=${state.apiKey}`,
+                url: `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&APPID=${state.apiKey}`,
                 method: 'GET'
             }).then(function(response){ state.currentWeather = response });
 
@@ -81,7 +81,7 @@ $('document').ready(function(){
         try{
             
             await $.ajax({
-                url: `http://api.openweathermap.org/data/2.5/uvi?appid=${state.apiKey}&lat=${lat}&lon=${lon}`,
+                url: `https://api.openweathermap.org/data/2.5/uvi?appid=${state.apiKey}&lat=${lat}&lon=${lon}`,
                 method: 'GET'
             }).then(function(response){ state.currentUV = response });
 
@@ -97,7 +97,7 @@ $('document').ready(function(){
         try {
 
             await $.ajax({
-                url: `http://api.openweathermap.org/data/2.5/forecast?id=${cityID}&units=imperial&appid=${state.apiKey}`,
+                url: `https://api.openweathermap.org/data/2.5/forecast?id=${cityID}&units=imperial&appid=${state.apiKey}`,
                 method: 'GET'
             }).then(function(response){
              
